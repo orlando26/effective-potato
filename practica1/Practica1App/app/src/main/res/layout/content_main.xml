@@ -38,4 +38,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/Tempe"
         android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rollgg"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pitchgg"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>

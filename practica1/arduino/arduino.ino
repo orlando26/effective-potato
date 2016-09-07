@@ -1,5 +1,7 @@
 #include <SoftwareSerial.h>
 int led = 13;
+int otroLed = 12;
+char roll;
 float tmp;
 SoftwareSerial bt(10, 11);
 void setup() {
@@ -25,10 +27,25 @@ void loop() {
       Serial.print("0");
       bt.print("0");
     digitalWrite(led, LOW);
-}
+        }
+
+
 Serial.print("-");
 bt.print("-");
-Serial.println(tmp);
+Serial.print(tmp);
 bt.println(tmp);
-  
+
+if (bt.available() > 0) {
+ roll=bt.read();
+ if(roll == '1'){
+   digitalWrite(otroLed, LOW);
+ }else if(roll == '0'){
+   
+   digitalWrite(otroLed, HIGH);
+ }
+ Serial.print(" ");
+ Serial.print(roll);
+}
+Serial.println();
+
 } 

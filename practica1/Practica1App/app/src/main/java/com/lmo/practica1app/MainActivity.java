@@ -3,7 +3,12 @@ package com.lmo.practica1app;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -26,12 +31,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
 
     Button Connect;
     TextView Result;
     TextView pulsillo;
     TextView tempe;
+    TextView rollgg;
+    TextView pitchgg;
     private String dataToSend;
 
     private static final String TAG = "Jon";
@@ -48,6 +55,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     boolean stopWorker = false;
     int readBufferPosition = 0;
     byte[] readBuffer = new byte[1024];
+    private long lastUpdate = 0;
+    private SensorManager senSensorManager;
+    private Sensor senAccelerometer;
+    private float last_x, last_y, last_z;
+    double fx = 0;
+    double fy = 0;
+    double fz = 0;
+    double roll, pitch;
+    private static final int SHAKE_THRESHOLD = 600;
+    private static final float ALPHA = 0.5f;
+    private boolean connected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +83,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+
         Connect = (Button) findViewById(R.id.connect);
         pulsillo=(TextView) findViewById(R.id.Pulsillo);
         Result = (TextView) findViewById(R.id.SerialText);
         tempe = (TextView) findViewById(R.id.Tempe);
+        rollgg = (TextView) findViewById(R.id.rollgg);
+        pitchgg = (TextView) findViewById(R.id.pitchgg);
 
 
         Connect.setOnClickListener(this);
@@ -82,6 +106,83 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }*/
         device = mBluetoothAdapter.getRemoteDevice("20:16:04:18:43:85");
         //Log.e("Jon", device.toString());
+    }
+
+    /**
+     * Metodo que se manda a llamar cada vez que el acelerometro detecta movimiento
+     * @param sensorEvent
+     */
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        Sensor mySensor = sensorEvent.sensor;
+        //Configuracion y uso del API del acelerometro
+        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+            long curTime = System.currentTimeMillis();
+
+            if ((curTime - lastUpdate) > 100) {
+                long diffTime = (curTime - lastUpdate);
+                lastUpdate = curTime;
+
+                float speed = Math.abs(x + y + z - last_x - last_y - last_z) / diffTime * 10000;
+
+                if (speed > SHAKE_THRESHOLD) {
+
+                }
+
+                //se definen last_x, last_y y last_z como los valores finales del acelerometro
+                last_x = x;
+                last_y = y;
+                last_z = z;
+
+                //se limpian un poco los valores fx, fy, fz para mayos estabilidad
+                fx = last_x * ALPHA + (fx * (1.0 - ALPHA));
+                fy = last_y * ALPHA + (fy * (1.0 - ALPHA));
+                fz = last_z * ALPHA + (fz * (1.0 - ALPHA));
+
+                // Se calculan los angulos roll y pitch a partir de los valores del acelerometro
+                roll  = (Math.atan2(-fy, fz)*180.0)/Math.PI;
+                pitch = (Math.atan2(fx, Math.sqrt(fy * fy + fz * fz))*180.0)/Math.PI;
+
+                //Se mapean los angulos de 0 a 180
+                roll = map((int)roll, -180, 180, 180, 0);
+                pitch = map((int)pitch, -180, 180, 0, 180);
+
+                if(connected){
+                    if(roll >= 115 && roll <= 145){
+                        writeData("1");
+                    }else if((roll >= 80 && roll < 115) | (roll >= 160 && roll <= 180) | (roll >= 1 && roll <= 15)){
+                        writeData("0");
+                    }
+                }
+
+                rollgg.setText(String.valueOf((int)roll));
+                pitchgg.setText(String.valueOf((int)pitch));
+
+
+            }
+        }
+    }
+
+
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+
+    }
+
+    protected void onPause() {
+        super.onPause();
+        senSensorManager.unregisterListener(this);
+    }
+
+    protected void onResume() {
+        super.onResume();
+        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private void CheckBt() {
@@ -100,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void connect() {
+        connected = true;
         Log.d(TAG, "20:16:04:18:43:85");
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("20:16:04:18:43:85");
         Log.d(TAG, "Connecting to ... " + device);
@@ -216,6 +318,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         workerThread.start();
     }
 
+    int map(int x, int in_min, int in_max, int out_min, int out_max) {
+        try{
+            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }catch(ArithmeticException e){
+            return 0;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
