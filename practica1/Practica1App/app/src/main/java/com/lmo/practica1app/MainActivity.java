@@ -3,6 +3,7 @@ package com.lmo.practica1app;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -29,12 +30,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     Button Connect;
     TextView Result;
+    TextView pulsillo;
+    TextView tempe;
     private String dataToSend;
 
     private static final String TAG = "Jon";
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
+    BluetoothDevice device = null;
     private static String address = "XX:XX:XX:XX:XX:XX";
     private static final UUID MY_UUID = UUID
             .fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -62,19 +66,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         Connect = (Button) findViewById(R.id.connect);
+        pulsillo=(TextView) findViewById(R.id.Pulsillo);
         Result = (TextView) findViewById(R.id.SerialText);
+        tempe = (TextView) findViewById(R.id.Tempe);
+
 
         Connect.setOnClickListener(this);
-        CheckBt();
-        BluetoothDevice device = null;// = mBluetoothAdapter.getRemoteDevice(address);
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        for(BluetoothDevice dev: pairedDevices){
+        CheckBt();// = mBluetoothAdapter.getRemoteDevice(address);
+        //Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        /*for(BluetoothDevice dev: pairedDevices){
             if(dev.getName() == "HC-05"){
                 device = dev;
                 break;
             }
-        }
-        Log.e("Jon", device.toString());
+        }*/
+        device = mBluetoothAdapter.getRemoteDevice("20:16:04:18:43:85");
+        //Log.e("Jon", device.toString());
     }
 
     private void CheckBt() {
@@ -92,16 +99,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void Connect() {
-        Log.d(TAG, address);
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+    public void connect() {
+        Log.d(TAG, "20:16:04:18:43:85");
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("20:16:04:18:43:85");
         Log.d(TAG, "Connecting to ... " + device);
         //mBluetoothAdapter.cancelDiscovery();
         try {
             btSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
             btSocket.connect();
             Log.d(TAG, "Connection made.");
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             try {
                 btSocket.close();
             } catch (IOException e2) {
@@ -173,11 +180,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         public void run()
                                         {
 
-                                            if(Result.getText().toString().equals("..")) {
-                                                Result.setText(data);
-                                            } else {
-                                                Result.append("\n"+data);
+                                            Result.setText(data);
+                                            String[] ambos;
+                                            ambos=data.split("-");
+
+                                            if (ambos[0].replaceAll("\\s+","").equals("1")){
+                                                pulsillo.setBackgroundColor(Color.parseColor("#ff0000"));
+                                            } else{
+                                                pulsillo.setBackgroundColor(Color.parseColor("#000000"));
                                             }
+
+                                            tempe.setText(ambos[1]);
 
                                                         /* You also can use Result.setText(data); it won't display multilines
                                                         */
@@ -228,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-
+        Toast.makeText(this, "no mames " + device.getAddress(), Toast.LENGTH_SHORT).show();
+        connect();
     }
 }

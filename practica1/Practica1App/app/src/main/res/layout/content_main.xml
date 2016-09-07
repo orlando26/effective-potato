@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.lmo.practica1app.MainActivity"
     tools:showIn="@layout/activity_main">
@@ -18,4 +19,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Conectar"/>
+
+    <Button
+    android:id="@+id/connect2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Conectar"/>
+
+    <TextView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="#000000"
+        android:id="@+id/Pulsillo"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Tempe"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>
