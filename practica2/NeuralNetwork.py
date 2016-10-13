@@ -73,7 +73,7 @@ class NeuralNetwork(object):
         e = 1e-4
 
         for p in range(len(paramsInitial)):
-            #Set perturbation vector
+            #Se asigna el vector de perturbacion
             perturb[p] = e
             N.setParams(paramsInitial + perturb)
             loss2 = N.costFunction(s, m)
@@ -81,13 +81,13 @@ class NeuralNetwork(object):
             N.setParams(paramsInitial - perturb)
             loss1 = N.costFunction(s, m)
 
-            #Compute Numerical Gradient
+            #Calculo del gradiente numerico
             numgrad[p] = (loss2 - loss1) / (2*e)
 
-            #Return the value we changed to zero:
+            #se regresa el valor que cambiamos a 0:
             perturb[p] = 0
             
-        #Return Params to original value:
+        #Regresamos los parametros a su valor original:
         N.setParams(paramsInitial)
 
         return numgrad
@@ -97,7 +97,7 @@ from scipy import optimize
 
 class trainer(object):
     def __init__(self, N):
-        #Make Local reference to network:
+        #Referencia local a la red neuronal:
         self.N = N
         
     def callbackF(self, params):
@@ -111,11 +111,11 @@ class trainer(object):
         return cost, grad
         
     def train(self, s, m):
-        #Make an internal variable for the callback function:
+        #Variables internas para la funcion callback:
         self.s = s
         self.m = m
 
-        #Make empty list to store costs:
+        #Lista vacia para guardar los errores:
         self.E = []
         
         params0 = self.N.getParams()
