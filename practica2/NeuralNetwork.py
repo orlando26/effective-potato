@@ -1,12 +1,41 @@
 #Clase modelo para una red neuronal 
 import numpy as np
 
+s = np.array((
+    [848,	324],
+    [864,	342],
+    [864,	345],
+    [875,	382],
+    [889,	432],
+    [842,	333],
+    [852,	406],
+    [861,	444],
+    [867,	452],
+    [874,	459]
+    ), dtype=float)
+s = s/1023
+s = np.insert(s, 2, 1, axis=1)
+
+m = np.array((
+    [179],
+    [148],
+    [105],
+    [105],
+    [105],
+    [179],
+    [179],
+    [179],
+    [160],
+    [149]
+    ), dtype=float)
+m = m/180
+
 class NeuralNetwork(object):
     def __init__(self):
         #Se definen las neuronas de cada capa
-        self.inputLayerSize = 5
-        self.outputLayerSize = 2
-        self.hiddenLayerSize = 9
+        self.inputLayerSize = 3
+        self.outputLayerSize = 1
+        self.hiddenLayerSize = 5
     
         #Se definen valores random para los pesos iniciales
         self.w1 = np.random.rand(self.inputLayerSize, self.hiddenLayerSize)
@@ -51,7 +80,7 @@ class NeuralNetwork(object):
     #funciones para interactuar con otras clases:
     def getParams(self):
         #obtiene w1 y w2 como un vector:
-        params = np.concatenate((self.W1.ravel(), self.W2.ravel()))
+        params = np.concatenate((self.w1.ravel(), self.w2.ravel()))
         return params
     
     def setParams(self, params):
@@ -93,36 +122,34 @@ class NeuralNetwork(object):
         return numgrad
 
 from scipy import optimize
-
-
 class trainer(object):
     def __init__(self, N):
-        #Referencia local a la red neuronal:
+        #Make Local reference to network:
         self.N = N
         
     def callbackF(self, params):
         self.N.setParams(params)
-        self.E.append(self.N.costFunction(self.s, self.m))   
+        self.J.append(self.N.costFunction(self.X, self.y))   
         
-    def costFunctionWrapper(self, params, s, m):
+    def costFunctionWrapper(self, params, X, y):
         self.N.setParams(params)
-        cost = self.N.costFunction(s, m)
-        grad = self.N.computeGradients(s,m)
+        cost = self.N.costFunction(X, y)
+        grad = self.N.computeGradients(X,y)
         return cost, grad
         
-    def train(self, s, m):
-        #Variables internas para la funcion callback:
-        self.s = s
-        self.m = m
+    def train(self, X, y):
+        #Make an internal variable for the callback function:
+        self.X = X
+        self.y = y
 
-        #Lista vacia para guardar los errores:
-        self.E = []
+        #Make empty list to store costs:
+        self.J = []
         
         params0 = self.N.getParams()
 
         options = {'maxiter': 200, 'disp' : True}
         _res = optimize.minimize(self.costFunctionWrapper, params0, jac=True, method='BFGS', \
-                                 args=(s, m), options=options, callback=self.callbackF)
+                                 args=(X, y), options=options, callback=self.callbackF)
 
         self.N.setParams(_res.x)
         self.optimizationResults = _res
