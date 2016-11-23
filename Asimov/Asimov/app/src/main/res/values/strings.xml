@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Asimov</string>
+    <string name="action_settings">Conectar</string>
+    <string name="arm_left">Brazo Izquierdo</string>
+    <string name="arm_right">Brazo derecho</string>
+    <string name="hello_world">Holi!</string>
+    <string name="unlocked">Desbloqueado</string>
+    <string name="locked">bloqueado</string>
+    <string name="pose_fist">fist</string>
+    <string name="pose_wavein">wave in</string>
+    <string name="pose_waveout">wave out</string>
+    <string name="pose_fingersspread">fingers spread</string>
+</resources>

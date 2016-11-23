@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.orlando.asimov.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <TextView
+
+        android:text="MYO Data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/arm_lbl"
+        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="arm " />
+
+    <TextView
+        android:id="@+id/state_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="bloqueado" />
+
+    <ImageView
+        android:id="@+id/gesture_img"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Accelerometer: "
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/roll_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Roll: "/>
+
+    <TextView
+        android:id="@+id/pitch_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pitch: "/>
+
+    <TextView
+        android:id="@+id/yaw_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yaw: "/>
+
+    <TextView
+        android:text="Android Data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="25sp"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Accelerometer: "
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/android_roll_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Roll: "/>
+
+    <TextView
+        android:id="@+id/android_pitch_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pitch: "/>
+
+    <TextView
+        android:id="@+id/android_yaw_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yaw: "/>
+
+    <TextView
+        android:text="Output Data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="25sp"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/rightArm_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:text="Right arm value: "/>
+
+</LinearLayout>

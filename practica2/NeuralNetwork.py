@@ -2,33 +2,32 @@
 import numpy as np
 
 s = np.array((
-    [848,	324],
-    [864,	342],
-    [864,	345],
-    [875,	382],
-    [889,	432],
-    [842,	333],
-    [852,	406],
-    [861,	444],
-    [867,	452],
-    [874,	459]
-    ), dtype=float)
-s = s/1023
-s = np.insert(s, 2, 1, axis=1)
+[74,	77, 180],
+[76,	80, 180],
+[78,	82, 180],
+[81,	85, 180],
+[84,	86, 180],
+[88,	87, 180],
+[91,	89, 180],
+[91,	90, 180],
+[92,	89, 180],
+[96,	91, 180],
+[101,	97, 180]
+), dtype=float)
 
 m = np.array((
-    [179],
-    [148],
-    [105],
-    [105],
-    [105],
-    [179],
-    [179],
-    [179],
-    [160],
-    [149]
-    ), dtype=float)
-m = m/180
+[0],
+[15],
+[20],
+[25],
+[40],
+[48],
+[60],
+[68],
+[80],
+[86],
+[90]
+), dtype=float)
 
 class NeuralNetwork(object):
     def __init__(self):
@@ -43,12 +42,13 @@ class NeuralNetwork(object):
     
     def forward(self, s):
         #Normalizacion de los valores de los sensores
-        s = s/np.amax(s, axis = 0)
+        s = s/180
         #Se propagan las entradas por la red hasta las salidas
         self.z2 = np.dot(s, self.w1)
         self.a = self.sigmoid(self.z2)
         self.z3 = np.dot(self.a, self.w2)
         self.mHat = self.sigmoid(self.z3)
+        self.mHat *= 90;
         return self.mHat
         
     def sigmoid(self, z):
@@ -139,6 +139,7 @@ class trainer(object):
         
     def train(self, X, y):
         #Make an internal variable for the callback function:
+        y = y/90
         self.X = X
         self.y = y
 
