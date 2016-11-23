@@ -109,4 +109,11 @@
         android:textSize="18sp"
         android:text="Right arm value: "/>
 
+    <TextView
+        android:id="@+id/legs_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:text="Asimov direction: "/>
+
 </LinearLayout>

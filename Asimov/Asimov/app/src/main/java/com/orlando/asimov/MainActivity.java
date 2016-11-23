@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     TextView mAndroidYaw;
     ImageView mGesture;
     TextView mRightArm;
+    TextView mLegs;
+    boolean fist = false;
     private long lastUpdate = 0;
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
@@ -56,6 +58,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final int SHAKE_THRESHOLD = 600;
     private static final float ALPHA = 0.5f;
     NeuralNetwork rightArmNet;
+    String spread = String.valueOf((char)91);
+    String forward = String.valueOf((char)92);
+    String backward = String.valueOf((char)93);
+    String left = String.valueOf((char)94);
+    String right = String.valueOf((char)95);
+    String stop = String.valueOf((char)96);
     double[][] armW1 = {
             {-2.618367, 0.1152786, 1.0609498, -0.1182739, 1.4148466},
             {-1.8480779, -0.5230582, 0.6904515, -0.0686407, 1.1100996},
@@ -124,11 +132,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mPitch.setText(String.format("Pitch: %.0f", pitch));
             mYaw.setText(String.format("Yaw: %.0f", yaw));
 
-            double[][] rArm = rightArmNet.forward(roll, pitch);
-            int valRArm = (int)rArm[0][0];
-            mRightArm.setText(String.format("Right arm value: %d", valRArm));
-            char armASCCI = (char) valRArm;
-            arduino.write(String.valueOf(armASCCI));
+            if(fist){
+                double[][] rArm = rightArmNet.forward(roll, pitch);
+                int valRArm = (int)rArm[0][0];
+                mRightArm.setText(String.format("Right arm value: %d", valRArm));
+                char armASCCI = (char) valRArm;
+                arduino.write(String.valueOf(armASCCI));
+            }
+
+
 
         }
         // onPose() is called whenever a Myo provides a new pose.
@@ -138,25 +150,35 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             // based on the pose we receive.
             switch (pose) {
                 case UNKNOWN:
+                    fist = false;
                     break;
-                case REST:break;
+                case REST:
+                    fist = false;
+                    break;
                 case DOUBLE_TAP:
+                    fist = true;
                     mGesture.setImageDrawable(getDrawable(R.drawable.double_tap));
                     //arduino.write("t");
                     break;
                 case FIST:
+                    fist = true;
                     mGesture.setImageDrawable(getDrawable(R.drawable.fist));
                     //arduino.write("f");
                     break;
                 case WAVE_IN:
+                    fist = true;
                     mGesture.setImageDrawable(getDrawable(R.drawable.wave_in));
                     //arduino.write("w");
                     break;
                 case WAVE_OUT:
+                    fist = false;
+                    arduino.write(spread);
                     mGesture.setImageDrawable(getDrawable(R.drawable.wave_out));
                     //arduino.write("W");
                     break;
                 case FINGERS_SPREAD:
+                    fist = false;
+                    arduino.write(spread);
                     mGesture.setImageDrawable(getDrawable(R.drawable.spread_fingers));
                     //arduino.write("s");
                     break;
@@ -196,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mAndroidPitch = (TextView)findViewById(R.id.android_pitch_lbl);
         mAndroidYaw = (TextView)findViewById(R.id.android_yaw_lbl);
         mRightArm = (TextView)findViewById(R.id.rightArm_lbl);
+        mLegs = (TextView)findViewById(R.id.legs_lbl);
 
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -314,6 +337,37 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mAndroidRoll.setText(String.format("Roll: %.0f", roll));
                 mAndroidPitch.setText(String.format("Pitch: %.0f", pitch));
                 mAndroidYaw.setText(String.format("Yaw: %.0f", yaw));
+
+                int rollA = (int)roll;
+
+                int pitchA = (int)pitch;
+
+                if(!fist){
+                    if(rollA > 100){
+                        mLegs.setText("forward");
+                        arduino.write(forward);
+                    }else if(rollA < 80){
+                        mLegs.setText("Backward");
+                        arduino.write(backward);
+                    }
+
+                    if(pitchA > 100){
+                        mLegs.setText("Left");
+                        arduino.write(left);
+                    }else if(pitchA < 80) {
+                        mLegs.setText("Right");
+                        arduino.write(right);
+                    }
+
+                    if(rollA > 80 && rollA < 100 && pitchA > 80 && pitchA < 100){
+                        mLegs.setText("stand");
+                        arduino.write(stop);
+                    }
+                }else{
+                    mLegs.setText("stand");
+                    arduino.write(stop);
+                }
+
             }
         }
     }
